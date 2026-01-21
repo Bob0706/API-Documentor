@@ -1,0 +1,2125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>API Documentation Adapter</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <style>
+            body {
+                font-family: 'Inter', sans-serif;
+                background: linear-gradient(135deg, #0f172a, #1e293b);
+                color: #e2e8f0;
+            }
+
+            .gradient-text {
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .card {
+                background: rgba(30, 41, 59, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                padding: 1.5rem;
+                backdrop-filter: blur(10px);
+            }
+
+            .feature-card {
+                background: rgba(30, 41, 59, 0.5);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 12px;
+                padding: 1.5rem;
+                transition: all 0.3s ease;
+            }
+
+            .feature-card:hover {
+                transform: translateY(-5px);
+                border-color: rgba(99, 102, 241, 0.3);
+            }
+
+            .testimonial-card {
+                background: rgba(30, 41, 59, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                padding: 1.5rem;
+            }
+
+            .form-input {
+                background: rgba(15, 23, 42, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding: 0.75rem;
+                color: white;
+                width: 100%;
+            }
+
+            #apiSpec {
+                color: #e2e8f0 !important;
+                caret-color: #ffffff !important;
+                font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace !important;
+            }
+
+            .form-input:focus {
+                outline: none;
+                border-color: #6366f1;
+                box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            }
+
+            .cta-button {
+                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                color: white;
+                font-weight: 600;
+                padding: 0.75rem 1.5rem;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+            }
+
+            .cta-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+            }
+
+            .tab-button {
+                padding: 0.75rem 1.5rem;
+                background: transparent;
+                border: none;
+                color: #94a3b8;
+                border-bottom: 2px solid transparent;
+                transition: all 0.3s ease;
+            }
+
+            .tab-button.active {
+                color: #6366f1;
+                border-bottom-color: #6366f1;
+            }
+
+            .tab-content {
+                display: none;
+            }
+
+            .tab-content.active {
+                display: block;
+            }
+
+            .loading {
+                width: 20px;
+                height: 20px;
+                border: 2px solid transparent;
+                border-top: 2px solid #6366f1;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .user-menu {
+                position: relative;
+            }
+
+            .user-dropdown {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                background: rgba(30, 41, 59, 0.95);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding: 0.5rem;
+                min-width: 150px;
+                backdrop-filter: blur(10px);
+                z-index: 1000;
+            }
+
+            .auth-container {
+                max-width: 400px;
+                width: 90%;
+            }
+
+            .auth-switch {
+                color: #6366f1;
+                cursor: pointer;
+                text-decoration: underline;
+            }
+
+            .test-response {
+                background: rgba(15, 23, 42, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding: 1rem;
+                max-height: 300px;
+                overflow-y: auto;
+                white-space: pre-wrap;
+                font-family: 'Courier New', monospace;
+            }
+
+            .download-options {
+                transition: all 0.3s ease;
+            }
+
+            .floating {
+                animation: floating 3s ease-in-out infinite;
+            }
+
+            @keyframes floating {
+
+                0%,
+                100% {
+                    transform: translateY(0);
+                }
+
+                50% {
+                    transform: translateY(-10px);
+                }
+            }
+
+            .typewriter {
+                overflow: hidden;
+                border-right: 2px solid #6366f1;
+                white-space: nowrap;
+                margin: 0 auto;
+                animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+            }
+
+            @keyframes typing {
+                from {
+                    width: 0
+                }
+
+                to {
+                    width: 100%
+                }
+            }
+
+            @keyframes blink-caret {
+
+                from,
+                to {
+                    border-color: transparent
+                }
+
+                50% {
+                    border-color: #6366f1
+                }
+            }
+
+            .slide-in {
+                animation: slideIn 1s ease-out;
+            }
+
+            @keyframes slideIn {
+                from {
+                    transform: translateY(30px);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .zoom-in {
+                animation: zoomIn 0.8s ease-out;
+            }
+
+            @keyframes zoomIn {
+                from {
+                    transform: scale(0.9);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            .slide-up {
+                animation: slideUp 0.8s ease-out;
+            }
+
+            @keyframes slideUp {
+                from {
+                    transform: translateY(40px);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .rotate-in {
+                animation: rotateIn 1s ease-out;
+            }
+
+            @keyframes rotateIn {
+                from {
+                    transform: rotateY(90deg);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: rotateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .fade-in {
+                animation: fadeIn 0.8s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            .expand {
+                animation: expand 0.8s ease-out;
+            }
+
+            @keyframes expand {
+                from {
+                    transform: scaleY(0.8);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: scaleY(1);
+                    opacity: 1;
+                }
+            }
+
+            .bounce {
+                animation: bounce 2s infinite;
+            }
+
+            @keyframes bounce {
+
+                0%,
+                20%,
+                50%,
+                80%,
+                100% {
+                    transform: translateY(0);
+                }
+
+                40% {
+                    transform: translateY(-5px);
+                }
+
+                60% {
+                    transform: translateY(-3px);
+                }
+            }
+
+            .pulse {
+                animation: pulse 2s infinite;
+            }
+
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+                }
+
+                70% {
+                    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+                }
+
+                100% {
+                    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+                }
+            }
+
+            .hidden {
+                display: none !important;
+            }
+
+            /* Face Recognition Styles */
+            .face-auth-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.95);
+                display: none;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                color: white;
+                font-family: 'Inter', sans-serif;
+            }
+
+            .face-auth-camera {
+                width: 400px;
+                height: 400px;
+                border-radius: 12px;
+                overflow: hidden;
+                margin-bottom: 20px;
+                border: 3px solid #6366f1;
+                position: relative;
+                background: #1f2937;
+            }
+
+            .face-auth-video {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .face-auth-status {
+                text-align: center;
+                margin-bottom: 20px;
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+            .face-auth-guide {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 200px;
+                height: 250px;
+                border: 2px dashed #6366f1;
+                border-radius: 8px;
+                pointer-events: none;
+            }
+
+            .face-auth-buttons {
+                display: flex;
+                gap: 10px;
+            }
+
+            .face-auth-btn {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+
+            .face-auth-primary {
+                background: #6366f1;
+                color: white;
+            }
+
+            .face-auth-secondary {
+                background: #6b7280;
+                color: white;
+            }
+
+            .face-auth-success {
+                color: #10b981;
+            }
+
+            .face-auth-error {
+                color: #ef4444;
+            }
+
+            .face-auth-processing {
+                color: #f59e0b;
+            }
+
+            .face-scan-animation {
+                animation: facePulse 2s infinite;
+            }
+
+            @keyframes facePulse {
+                0% {
+                    border-color: #6366f1;
+                }
+
+                50% {
+                    border-color: #a5b4fc;
+                }
+
+                100% {
+                    border-color: #6366f1;
+                }
+            }
+
+            .face-auth-options {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .face-auth-option-btn {
+                padding: 8px 16px;
+                border: 1px solid #6366f1;
+                border-radius: 6px;
+                background: transparent;
+                color: #6366f1;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+
+            .face-auth-option-btn:hover {
+                background: #6366f1;
+                color: white;
+            }
+
+            .face-auth-option-btn.active {
+                background: #6366f1;
+                color: white;
+            }
+
+            /* Analytics Styles */
+            .time-range-btn {
+                padding: 0.5rem 1rem;
+                background: rgba(30, 41, 59, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+                color: #94a3b8;
+                font-size: 0.875rem;
+                transition: all 0.3s ease;
+            }
+
+            .time-range-btn:hover {
+                background: rgba(30, 41, 59, 0.9);
+                color: #e2e8f0;
+            }
+
+            .time-range-btn.active {
+                background: #6366f1;
+                color: white;
+                border-color: #6366f1;
+            }
+
+            .metric-card {
+                background: rgba(30, 41, 59, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding: 1rem;
+                text-align: center;
+            }
+
+            .metric-value {
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: #e2e8f0;
+                margin-bottom: 0.25rem;
+            }
+
+            .metric-label {
+                font-size: 0.875rem;
+                color: #94a3b8;
+                margin-bottom: 0.5rem;
+            }
+
+            .metric-change {
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+
+            .metric-change.positive {
+                color: #10b981;
+            }
+
+            .metric-change.negative {
+                color: #ef4444;
+            }
+
+            .chart-container {
+                background: rgba(30, 41, 59, 0.5);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding: 1rem;
+            }
+        </style>
+    </head>
+
+    <body class="min-h-screen p-4 md:p-8">
+        <!-- Navigation Bar -->
+        <nav class="max-w-7xl mx-auto mb-10 flex justify-between items-center">
+            <div class="flex items-center">
+                <i class="fas fa-robot text-2xl text-indigo-500 mr-3"></i>
+                <h1 class="text-xl font-bold gradient-text">API Documentation Adapter</h1>
+            </div>
+
+            <div id="authButtons" class="flex space-x-4">
+                <button id="loginBtn" class="text-indigo-400 hover:text-indigo-300 transition-colors">
+                    <i class="fas fa-sign-in-alt mr-1"></i> Sign In
+                </button>
+                <button id="registerBtn"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition-colors">
+                    <i class="fas fa-user-plus mr-1"></i> Register
+                </button>
+            </div>
+
+            <div id="userMenu" class="user-menu hidden">
+                <button id="userButton" class="flex items-center text-gray-300 hover:text-white transition-colors">
+                    <i class="fas fa-user-circle text-xl mr-2"></i>
+                    <span id="userName">User</span>
+                    <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                </button>
+                <div id="userDropdown" class="user-dropdown hidden">
+                    <button id="logoutBtn"
+                        class="w-full text-left py-2 px-3 text-red-400 hover:bg-gray-800 rounded transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Landing Page Content (Visible when not logged in) -->
+        <div id="landingPage" class="landing-container">
+            <!-- Hero Section -->
+            <section class="hero-section text-center">
+                <div class="floating inline-block mb-6">
+                    <i class="fas fa-robot text-6xl text-indigo-500"></i>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-bold gradient-text mb-4 typewriter">API Documentation Adapter</h1>
+                <p class="text-xl text-gray-400 mb-8 max-w-2xl mx-auto slide-in">Transform API specifications into
+                    audience-specific documentation with the power of AI</p>
+
+                <div class="flex flex-col md:flex-row gap-4 mb-12 justify-center">
+                    <button id="landingRegisterBtn" class="cta-button text-lg">
+                        <i class="fas fa-rocket mr-2"></i> Get Started Free
+                    </button>
+                    <button id="viewDocsBtn"
+                        class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors text-lg">
+                        <i class="fas fa-book mr-2"></i> View Documentation
+                    </button>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="my-20">
+                <h2 class="text-3xl font-bold text-center gradient-text mb-2 slide-in">Why Choose Our Platform?</h2>
+                <p class="text-gray-400 text-center mb-12 max-w-2xl mx-auto slide-in">We help developers, technical
+                    writers, and product teams create perfect documentation for every audience</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="feature-card zoom-in">
+                        <div class="flex items-start mb-4">
+                            <div class="bg-indigo-500 p-3 rounded-lg mr-4">
+                                <i class="fas fa-bolt text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-200">API-Powered Generation</h3>
+                                <p class="text-gray-400 mt-2">Our advanced AI analyzes your API specs and creates
+                                    tailored documentation in seconds, not hours.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-card zoom-in" style="animation-delay: 0.2s">
+                        <div class="flex items-start mb-4">
+                            <div class="bg-indigo-500 p-3 rounded-lg mr-4">
+                                <i class="fas fa-users text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-200">Audience-Specific Content</h3>
+                                <p class="text-gray-400 mt-2">Generate documentation customized for developers, security
+                                    analysts, product managers, and more.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-card zoom-in" style="animation-delay: 0.4s">
+                        <div class="flex items-start mb-4">
+                            <div class="bg-indigo-500 p-3 rounded-lg mr-4">
+                                <i class="fas fa-vial text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-200">Integrated API Testing</h3>
+                                <p class="text-gray-400 mt-2">Test your API endpoints directly in the platform and
+                                    validate your documentation with real responses.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works Section -->
+            <section class="my-20">
+                <h2 class="text-3xl font-bold text-center gradient-text mb-12 slide-in">How It Works</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="text-center slide-up" style="animation-delay: 0.1s">
+                        <div class="bg-indigo-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white font-bold text-xl">1</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-2">Paste API Spec</h3>
+                        <p class="text-gray-400">Simply paste your OpenAPI/Swagger specification</p>
+                    </div>
+
+                    <div class="text-center slide-up" style="animation-delay: 0.3s">
+                        <div class="bg-indigo-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white font-bold text-xl">2</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-2">Select Audience</h3>
+                        <p class="text-gray-400">Choose who you're writing documentation for</p>
+                    </div>
+
+                    <div class="text-center slide-up" style="animation-delay: 0.5s">
+                        <div class="bg-indigo-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white font-bold text-xl">3</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-2">Generate Docs</h3>
+                        <p class="text-gray-400">Let our AI create tailored documentation</p>
+                    </div>
+
+                    <div class="text-center slide-up" style="animation-delay: 0.7s">
+                        <div class="bg-indigo-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white font-bold text-xl">4</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-200 mb-2">Test & Validate</h3>
+                        <p class="text-gray-400">Test API endpoints and validate documentation</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonials Section -->
+            <section class="my-20">
+                <h2 class="text-3xl font-bold text-center gradient-text mb-12 slide-in">What Our Users Say</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="testimonial-card rotate-in">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center mr-4">
+                                <span class="text-white font-bold">TN</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-200">Tanishq Nerkar</h4>
+                                <p class="text-gray-400 text-sm">Senior Backend Engineer</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300">"This tool cut our documentation time by 80%. The AI perfectly
+                            understands technical nuances and creates docs that our junior developers actually
+                            understand."</p>
+                    </div>
+
+                    <div class="testimonial-card rotate-in" style="animation-delay: 0.3s">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center mr-4">
+                                <span class="text-white font-bold">HT</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-200">Harsh Tyagi</h4>
+                                <p class="text-gray-400 text-sm">Product Manager</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300">"Finally, API documentation that speaks to business stakeholders! The
+                            product-focused docs help me communicate value without getting lost in technical details."
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="my-20 text-center">
+                <div class="card max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold gradient-text mb-4">Ready to Transform Your Documentation?</h2>
+                    <p class="text-gray-400 mb-8 text-lg">Join thousands of developers saving time and creating better
+                        documentation with AI</p>
+                    <div class="flex flex-col md:flex-row gap-4 justify-center">
+                        <button id="finalRegisterBtn" class="cta-button text-lg">
+                            <i class="fas fa-user-plus mr-2"></i> Create Free Account
+                        </button>
+                        <button id="finalViewDocsBtn"
+                            class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors text-lg">
+                            <i class="fas fa-book mr-2"></i> View Documentation
+                        </button>
+                    </div>
+                    <p class="text-gray-500 mt-4 text-sm">No credit card required • Free plan available</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Authentication Modals -->
+        <div id="authModals" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 hidden">
+            <!-- Login Modal -->
+            <div id="loginModal" class="auth-container card hidden">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold gradient-text mb-2">Sign In</h2>
+                    <p class="text-gray-400">Access your documentation workspace</p>
+                </div>
+
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label for="loginEmail" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                        <input type="email" id="loginEmail" class="form-input" placeholder="your.email@example.com"
+                            required>
+                    </div>
+
+                    <div>
+                        <label for="loginPassword" class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                        <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="face-auth-options">
+                        <button type="button" id="faceLoginBtn" class="face-auth-option-btn active">
+                            <i class="fas fa-camera mr-1"></i> Face Login
+                        </button>
+                        <button type="button" id="passwordLoginBtn" class="face-auth-option-btn">
+                            <i class="fas fa-key mr-1"></i> Password Only
+                        </button>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+                        Sign In
+                    </button>
+
+                    <div class="text-center text-gray-400">
+                        Don't have an account? <span id="switchToRegister" class="auth-switch">Register</span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Register Modal -->
+            <div id="registerModal" class="auth-container card hidden">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold gradient-text mb-2">Create Account</h2>
+                    <p class="text-gray-400">Join our documentation platform</p>
+                </div>
+
+                <form id="registerForm" class="space-y-4">
+                    <div>
+                        <label for="registerName" class="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
+                        <input type="text" id="registerName" class="form-input" placeholder="John Doe" required>
+                    </div>
+
+                    <div>
+                        <label for="registerEmail" class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                        <input type="email" id="registerEmail" class="form-input" placeholder="your.email@example.com"
+                            required>
+                    </div>
+
+                    <div>
+                        <label for="registerPassword"
+                            class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                        <input type="password" id="registerPassword" class="form-input" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="face-auth-options">
+                        <button type="button" id="faceRegisterBtn" class="face-auth-option-btn active">
+                            <i class="fas fa-camera mr-1"></i> Register with Face
+                        </button>
+                        <button type="button" id="passwordRegisterBtn" class="face-auth-option-btn">
+                            <i class="fas fa-key mr-1"></i> Password Only
+                        </button>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+                        Create Account
+                    </button>
+
+                    <div class="text-center text-gray-400">
+                        Already have an account? <span id="switchToLogin" class="auth-switch">Sign In</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main Application Content (Visible when logged in) -->
+        <div id="appContent" class="max-w-6xl mx-auto hidden">
+            <!-- Header with animation -->
+            <header class="text-center mb-10 fade-in">
+                <div class="floating inline-block mb-4">
+                    <i class="fas fa-robot text-4xl text-indigo-500"></i>
+                </div>
+                <h1 class="text-2xl md:text-3xl font-bold gradient-text mb-2 typewriter">API Documentation Adapter</h1>
+                <p class="text-gray-400 slide-in">Transform API specs into audience-specific documentation and test
+                    endpoints</p>
+            </header>
+
+            <!-- Tabs for Documentation and Testing -->
+            <div class="flex mb-6 border-b border-gray-700">
+                <button id="docsTab" class="tab-button active">
+                    <i class="fas fa-file-alt mr-2"></i> Documentation
+                </button>
+
+                <button id="analyticsTab" class="tab-button">
+                    <i class="fas fa-chart-bar mr-2"></i> Analytics
+                </button>
+            </div>
+
+            <!-- Documentation Tab Content -->
+            <div id="docsContent" class="tab-content active">
+                <!-- Input Section -->
+                <section class="mb-8">
+                    <div class="card mb-6 expand">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-200 flex items-center">
+                            <i class="fas fa-code mr-2 text-indigo-400"></i> API Specification
+                        </h2>
+                        <textarea id="apiSpec" rows="10"
+                            class="w-full p-4 bg-gray-800 border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 text-white font-mono"
+                            placeholder="Paste your API specification here..."></textarea>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4 slide-in">
+                        <div class="flex-1">
+                            <label for="audienceFocus" class="block text-sm font-medium text-gray-300 mb-2">
+                                <i class="fas fa-users mr-1"></i> Target Audience
+                            </label>
+                            <select id="audienceFocus"
+                                class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300">
+                                <option value="Beginner Developer (Focus on simple steps and basic concepts)">Beginner
+                                    Developer</option>
+                                <option value="Experienced Backend Engineer (Focus on performance and architecture)">
+                                    Experienced Backend Engineer</option>
+                                <option value="Security Analyst (Focus on authentication, data handling, and risks)">
+                                    Security Analyst</option>
+                                <option value="Product Manager (Focus on business value and use cases)">Product Manager
+                                </option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button id="generateBtn"
+                                class="w-full md:w-auto bg-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 flex items-center justify-center pulse">
+                                <span id="buttonText">Generate Docs</span>
+                                <div id="loadingIndicator" class="loading ml-2 hidden"></div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="messageBox" class="mt-4 text-sm p-3 rounded-lg hidden fade-in"></div>
+                </section>
+
+                <!-- Download Section -->
+                <section id="downloadSection" class="mb-8 hidden fade-in">
+                    <div class="card">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-200 flex items-center justify-between">
+                            <span><i class="fas fa-download mr-2 text-indigo-400"></i> Download Documentation</span>
+                            <button id="toggleDownloadOptions"
+                                class="text-indigo-400 hover:text-indigo-300 transition-colors">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </h2>
+
+                        <div id="downloadOptions" class="download-options">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                <button id="downloadPDF"
+                                    class="bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center">
+                                    <i class="fas fa-file-pdf mr-2"></i> PDF Format
+                                </button>
+                                <button id="downloadMarkdown"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center">
+                                    <i class="fas fa-file-alt mr-2"></i> Markdown
+                                </button>
+                                <button id="downloadHTML"
+                                    class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center">
+                                    <i class="fas fa-file-code mr-2"></i> HTML Page
+                                </button>
+                            </div>
+
+                            <div class="mt-4 text-sm text-gray-400">
+                                <p><i class="fas fa-info-circle mr-1 text-indigo-400"></i> Choose your preferred format.
+                                    PDF is best for printing, Markdown for documentation systems, and HTML for web
+                                    viewing.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Output Section -->
+                <section>
+                    <h2 class="text-xl font-semibold mb-4 text-gray-200 flex items-center fade-in">
+                        <i class="fas fa-file-alt mr-2 text-indigo-400"></i> Generated Documentation
+                    </h2>
+                    <div id="outputContent" class="space-y-6">
+                        <div class="card expand" id="overviewCard">
+                            <h3 class="text-lg font-semibold text-indigo-400 mb-3 flex items-center">
+                                <i class="fas fa-eye mr-2 bounce"></i> Overview
+                            </h3>
+                            <div id="overview" class="text-gray-400 text-sm">
+                                Select an audience and click "Generate Docs" to create tailored documentation.
+                            </div>
+                        </div>
+
+                        <div class="card expand" id="quickstartCard">
+                            <h3 class="text-lg font-semibold text-indigo-400 mb-3 flex items-center">
+                                <i class="fas fa-rocket mr-2 bounce"></i> Quick Start
+                            </h3>
+                            <div id="quickstart" class="text-gray-400 text-sm">
+                                Select an audience and click "Generate Docs" to create tailored documentation.
+                            </div>
+                        </div>
+
+                        <div class="card expand" id="securityCard">
+                            <h3 class="text-lg font-semibold text-indigo-400 mb-3 flex items-center">
+                                <i class="fas fa-shield-alt mr-2 bounce"></i> Security & Compliance
+                            </h3>
+                            <div id="security" class="text-gray-400 text-sm">
+                                Select an audience and click "Generate Docs" to create tailored documentation.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+            <!-- Analytics Tab Content -->
+            <div id="analyticsContent" class="tab-content">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Analytics Overview -->
+                    <div class="lg:col-span-2">
+                        <div class="card mb-6">
+                            <h2 class="text-xl font-semibold mb-4 text-gray-200 flex items-center">
+                                <i class="fas fa-chart-line mr-2 text-indigo-400"></i> Documentation Analytics Overview
+                            </h2>
+
+                            <!-- Time Range Selector -->
+                            <div class="flex space-x-2 mb-6">
+                                <button class="time-range-btn active" data-range="7d">Last 7 Days</button>
+                                <button class="time-range-btn" data-range="30d">Last 30 Days</button>
+                                <button class="time-range-btn" data-range="90d">Last 90 Days</button>
+                            </div>
+
+                            <!-- Key Metrics -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                <div class="metric-card">
+                                    <div class="metric-value" id="totalViews">0</div>
+                                    <div class="metric-label">Total Views</div>
+                                    <div class="metric-change positive" id="viewsChange">+0%</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value" id="uniqueVisitors">0</div>
+                                    <div class="metric-label">Unique Visitors</div>
+                                    <div class="metric-change positive" id="visitorsChange">+0%</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value" id="avgTime">0m</div>
+                                    <div class="metric-label">Avg. Time</div>
+                                    <div class="metric-change positive" id="timeChange">+0%</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value" id="bounceRate">0%</div>
+                                    <div class="metric-label">Bounce Rate</div>
+                                    <div class="metric-change negative" id="bounceChange">+0%</div>
+                                </div>
+                            </div>
+
+                            <!-- Charts -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div class="chart-container">
+                                    <h3 class="text-lg font-semibold mb-3 text-gray-300">Page Views Over Time</h3>
+                                    <canvas id="viewsChart" height="200"></canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <h3 class="text-lg font-semibold mb-3 text-gray-300">Audience Distribution</h3>
+                                    <canvas id="audienceChart" height="200"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Top Pages -->
+                            <div class="chart-container">
+                                <h3 class="text-lg font-semibold mb-3 text-gray-300">Most Viewed Documentation Pages
+                                </h3>
+                                <div id="topPagesList" class="space-y-2">
+                                    <!-- Top pages will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Insights & Recommendations -->
+                    <div class="lg:col-span-1">
+                        <div class="card mb-6">
+                            <h2 class="text-xl font-semibold mb-4 text-gray-200 flex items-center">
+                                <i class="fas fa-lightbulb mr-2 text-indigo-400"></i> Insights & Recommendations
+                            </h2>
+                            <div id="insightsList" class="space-y-4">
+                                <!-- Insights will be populated here -->
+                            </div>
+                        </div>
+
+                        <!-- Search Analytics -->
+                        <div class="card">
+                            <h2 class="text-xl font-semibold mb-4 text-gray-200 flex items-center">
+                                <i class="fas fa-search mr-2 text-indigo-400"></i> Search Analytics
+                            </h2>
+                            <div class="mb-4">
+                                <h3 class="text-md font-semibold mb-2 text-gray-300">Top Search Queries</h3>
+                                <div id="topSearches" class="space-y-2">
+                                    <!-- Top searches will be populated here -->
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-md font-semibold mb-2 text-gray-300">Content Gaps</h3>
+                                <div id="contentGaps" class="space-y-2">
+                                    <!-- Content gaps will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Face Recognition Overlay -->
+        <div id="faceAuthOverlay" class="face-auth-overlay">
+            <div class="face-auth-camera">
+                <video id="faceAuthVideo" class="face-auth-video" autoplay playsinline></video>
+                <canvas id="faceAuthCanvas" class="hidden"></canvas>
+                <div class="face-auth-guide face-scan-animation"></div>
+            </div>
+            <div class="face-auth-status" id="faceAuthStatus">Initializing camera...</div>
+            <div class="face-auth-buttons">
+                <button class="face-auth-btn face-auth-secondary" id="faceAuthCancel">Cancel</button>
+                <button class="face-auth-btn face-auth-primary hidden" id="faceAuthRetry">Retry</button>
+            </div>
+        </div>
+
+        <script>
+            // Face Recognition Authentication System
+            class FaceAuthSystem {
+                constructor() {
+                    this.isInitialized = false;
+                    this.faceModels = JSON.parse(localStorage.getItem('faceAuthModels') || '{}');
+                    this.currentStream = null;
+                    this.verificationAttempts = 0;
+                    this.maxAttempts = 3;
+                    this.useFaceAuth = true;
+                    this.faceImages = JSON.parse(localStorage.getItem('faceImages') || '{}');
+                    this.currentEmail = null;
+                }
+
+                async initialize() {
+                    if (this.isInitialized) return;
+
+                    // Check if camera is available
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        console.warn('Camera not available');
+                        this.useFaceAuth = false;
+                        return;
+                    }
+
+                    this.isInitialized = true;
+                }
+
+                createOverlay() {
+                    const overlay = document.getElementById('faceAuthOverlay');
+                    if (overlay) return overlay;
+
+                    // Create overlay if it doesn't exist
+                    const newOverlay = document.createElement('div');
+                    newOverlay.id = 'faceAuthOverlay';
+                    newOverlay.className = 'face-auth-overlay';
+                    newOverlay.innerHTML = `
+                    <div class="face-auth-camera">
+                        <video id="faceAuthVideo" class="face-auth-video" autoplay playsinline></video>
+                        <canvas id="faceAuthCanvas" class="hidden"></canvas>
+                        <div class="face-auth-guide face-scan-animation"></div>
+                    </div>
+                    <div class="face-auth-status" id="faceAuthStatus">Initializing camera...</div>
+                    <div class="face-auth-buttons">
+                        <button class="face-auth-btn face-auth-secondary" id="faceAuthCancel">Cancel</button>
+                        <button class="face-auth-btn face-auth-primary hidden" id="faceAuthRetry">Retry</button>
+                    </div>
+                `;
+                    document.body.appendChild(newOverlay);
+
+                    // Setup event listeners
+                    document.getElementById('faceAuthCancel').addEventListener('click', () => {
+                        this.stopCamera();
+                    });
+
+                    document.getElementById('faceAuthRetry').addEventListener('click', () => {
+                        this.retryVerification();
+                    });
+
+                    return newOverlay;
+                }
+
+                async startCamera() {
+                    try {
+                        const overlay = this.createOverlay();
+                        const video = document.getElementById('faceAuthVideo');
+                        const canvas = document.getElementById('faceAuthCanvas');
+
+                        const constraints = {
+                            video: {
+                                width: { ideal: 640 },
+                                height: { ideal: 640 },
+                                facingMode: 'user',
+                                frameRate: { ideal: 30 }
+                            }
+                        };
+
+                        this.currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                        video.srcObject = this.currentStream;
+
+                        return new Promise((resolve) => {
+                            video.onloadedmetadata = () => {
+                                // Set canvas dimensions to match video
+                                canvas.width = video.videoWidth;
+                                canvas.height = video.videoHeight;
+                                resolve(true);
+                            };
+                        });
+                    } catch (error) {
+                        console.error('Camera error:', error);
+                        this.updateStatus('Camera access denied. Please allow camera permissions.', 'error');
+                        return false;
+                    }
+                }
+
+                stopCamera() {
+                    if (this.currentStream) {
+                        this.currentStream.getTracks().forEach(track => track.stop());
+                        this.currentStream = null;
+                    }
+                    const overlay = document.getElementById('faceAuthOverlay');
+                    if (overlay) {
+                        overlay.style.display = 'none';
+                    }
+                    this.verificationAttempts = 0;
+                }
+
+                updateStatus(message, type = 'info') {
+                    const statusEl = document.getElementById('faceAuthStatus');
+                    if (statusEl) {
+                        statusEl.textContent = message;
+                        statusEl.className = 'face-auth-status';
+                        if (type === 'success') statusEl.classList.add('face-auth-success');
+                        if (type === 'error') statusEl.classList.add('face-auth-error');
+                        if (type === 'processing') statusEl.classList.add('face-auth-processing');
+                    }
+                }
+
+                // Capture image from video stream
+                captureFaceImage() {
+                    const video = document.getElementById('faceAuthVideo');
+                    const canvas = document.getElementById('faceAuthCanvas');
+                    const ctx = canvas.getContext('2d');
+
+                    // Draw current video frame to canvas
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    // Convert canvas to data URL (image)
+                    return canvas.toDataURL('image/jpeg', 0.8);
+                }
+
+                // Calculate similarity between two face images
+                calculateImageSimilarity(img1, img2) {
+                    // In a real implementation, this would use proper facial recognition
+                    // For this demo, we'll simulate a similarity score
+
+                    // Simple simulation: generate a random score between 70-95% for same person
+                    // and 30-60% for different people
+                    const isSamePerson = Math.random() > 0.3; // 70% chance of being same person in demo
+
+                    if (isSamePerson) {
+                        return Math.floor(Math.random() * 25) + 70; // 70-95%
+                    } else {
+                        return Math.floor(Math.random() * 30) + 30; // 30-60%
+                    }
+                }
+
+                async registerFace(email) {
+                    if (!this.useFaceAuth) {
+                        return { success: false, message: 'Face authentication not available' };
+                    }
+
+                    const overlay = this.createOverlay();
+                    overlay.style.display = 'flex';
+
+                    this.updateStatus('Please look at the camera for face registration', 'processing');
+
+                    if (!await this.startCamera()) {
+                        return { success: false, message: 'Camera access failed' };
+                    }
+
+                    return new Promise(async (resolve) => {
+                        setTimeout(async () => {
+                            try {
+                                this.updateStatus('Capturing face image...', 'processing');
+
+                                // Capture face image
+                                const faceImage = this.captureFaceImage();
+
+                                // Store the image in localStorage (in real app, send to server)
+                                this.faceImages[email] = faceImage;
+                                localStorage.setItem('faceImages', JSON.stringify(this.faceImages));
+
+                                // Also store face features for compatibility
+                                const features = {
+                                    faceId: 'face_' + Math.random().toString(36).substr(2, 9),
+                                    dimensions: {
+                                        width: Math.random() * 0.3 + 0.7,
+                                        height: Math.random() * 0.3 + 0.7,
+                                        ratio: Math.random() * 0.1 + 0.9
+                                    },
+                                    landmarks: Array(128).fill(0).map(() => Math.random()),
+                                    timestamp: Date.now()
+                                };
+                                this.faceModels[email] = features;
+                                localStorage.setItem('faceAuthModels', JSON.stringify(this.faceModels));
+
+                                this.updateStatus('Face registered successfully!', 'success');
+
+                                setTimeout(() => {
+                                    this.stopCamera();
+                                    resolve({ success: true, image: faceImage });
+                                }, 1500);
+
+                            } catch (error) {
+                                this.updateStatus('Face registration failed', 'error');
+                                setTimeout(() => {
+                                    this.stopCamera();
+                                    resolve({ success: false, message: 'Registration process failed' });
+                                }, 1500);
+                            }
+                        }, 3000);
+                    });
+                }
+
+                async verifyFace(email) {
+                    if (!this.useFaceAuth) {
+                        return { success: false, message: 'Face authentication not available' };
+                    }
+
+                    if (!this.faceImages[email]) {
+                        return { success: false, message: 'No face registered for this account' };
+                    }
+
+                    this.currentEmail = email;
+                    const overlay = this.createOverlay();
+                    overlay.style.display = 'flex';
+
+                    this.updateStatus('Please look at the camera for face verification', 'processing');
+
+                    if (!await this.startCamera()) {
+                        return { success: false, message: 'Camera access failed' };
+                    }
+
+                    return new Promise(async (resolve) => {
+                        setTimeout(async () => {
+                            try {
+                                this.updateStatus('Verifying your face...', 'processing');
+
+                                // Capture current face image
+                                const currentImage = this.captureFaceImage();
+                                const storedImage = this.faceImages[email];
+
+                                // Calculate similarity between images
+                                const similarity = this.calculateImageSimilarity(currentImage, storedImage);
+                                const threshold = 75; // Similarity threshold
+
+                                if (similarity >= threshold) {
+                                    this.updateStatus(`Face verified successfully! (${similarity}% match)`, 'success');
+                                    setTimeout(() => {
+                                        this.stopCamera();
+                                        resolve({ success: true, similarity: similarity });
+                                    }, 1500);
+                                } else {
+                                    this.verificationAttempts++;
+                                    if (this.verificationAttempts >= this.maxAttempts) {
+                                        this.updateStatus('Too many failed attempts. Please try password login.', 'error');
+                                        document.getElementById('faceAuthRetry').classList.add('hidden');
+                                        setTimeout(() => {
+                                            this.stopCamera();
+                                            this.verificationAttempts = 0;
+                                            resolve({
+                                                success: false,
+                                                message: 'Face verification failed multiple times',
+                                                attemptsExceeded: true
+                                            });
+                                        }, 2000);
+                                    } else {
+                                        this.updateStatus(`Face doesn't match. Attempt ${this.verificationAttempts}/${this.maxAttempts}`, 'error');
+                                        document.getElementById('faceAuthRetry').classList.remove('hidden');
+                                        setTimeout(() => {
+                                            this.stopCamera();
+                                            resolve({
+                                                success: false,
+                                                message: 'Face verification failed',
+                                                attempts: this.verificationAttempts
+                                            });
+                                        }, 2000);
+                                    }
+                                }
+
+                            } catch (error) {
+                                this.updateStatus('Verification failed', 'error');
+                                setTimeout(() => {
+                                    this.stopCamera();
+                                    resolve({ success: false, message: 'Verification process failed' });
+                                }, 1500);
+                            }
+                        }, 3000);
+                    });
+                }
+
+                retryVerification() {
+                    document.getElementById('faceAuthRetry').classList.add('hidden');
+                    this.verifyFace(this.currentEmail);
+                }
+            }
+
+            // Analytics System
+            class DocumentationAnalytics {
+                constructor() {
+                    this.analyticsData = this.loadAnalyticsData();
+                    this.currentRange = '7d';
+                    this.initializeAnalytics();
+                }
+
+                loadAnalyticsData() {
+                    const saved = localStorage.getItem('docAnalytics');
+                    if (saved) {
+                        return JSON.parse(saved);
+                    }
+
+                    // Generate sample analytics data
+                    return this.generateSampleData();
+                }
+
+                generateSampleData() {
+                    const data = {
+                        pageViews: [],
+                        userSessions: [],
+                        searchQueries: [],
+                        audienceDistribution: {
+                            'Beginner Developer': 45,
+                            'Experienced Backend Engineer': 25,
+                            'Security Analyst': 15,
+                            'Product Manager': 15
+                        },
+                        topPages: [
+                            { page: 'User Management API Overview', views: 1245, change: 12 },
+                            { page: 'Authentication Guide', views: 987, change: 8 },
+                            { page: 'Error Handling', views: 765, change: -3 },
+                            { page: 'Rate Limiting', views: 543, change: 15 },
+                            { page: 'Webhooks', views: 432, change: 22 }
+                        ],
+                        insights: [
+                            {
+                                type: 'success',
+                                title: 'High Engagement',
+                                message: 'Users spend an average of 4.2 minutes on your documentation'
+                            },
+                            {
+                                type: 'warning',
+                                title: 'Content Gap',
+                                message: 'Users frequently search for "rate limiting" but find no results'
+                            },
+                            {
+                                type: 'info',
+                                title: 'Popular Section',
+                                message: 'The Authentication guide is your most viewed page'
+                            }
+                        ]
+                    };
+
+                    // Generate 30 days of page view data
+                    const now = new Date();
+                    for (let i = 29; i >= 0; i--) {
+                        const date = new Date(now);
+                        date.setDate(date.getDate() - i);
+
+                        data.pageViews.push({
+                            date: date.toISOString().split('T')[0],
+                            views: Math.floor(Math.random() * 100) + 50,
+                            uniqueVisitors: Math.floor(Math.random() * 80) + 20
+                        });
+                    }
+
+                    // Generate search queries
+                    const searches = [
+                        { query: 'authentication', count: 45 },
+                        { query: 'rate limiting', count: 32 },
+                        { query: 'error codes', count: 28 },
+                        { query: 'webhooks', count: 21 },
+                        { query: 'pagination', count: 18 }
+                    ];
+
+                    data.searchQueries = searches;
+
+                    return data;
+                }
+
+                initializeAnalytics() {
+                    this.setupEventListeners();
+                    this.updateAnalyticsDisplay();
+                }
+
+                setupEventListeners() {
+                    // Time range buttons
+                    document.querySelectorAll('.time-range-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            document.querySelectorAll('.time-range-btn').forEach(b => b.classList.remove('active'));
+                            e.target.classList.add('active');
+                            this.currentRange = e.target.dataset.range;
+                            this.updateAnalyticsDisplay();
+                        });
+                    });
+
+                    // Track documentation generation
+                    const generateBtn = document.getElementById('generateBtn');
+                    if (generateBtn) {
+                        generateBtn.addEventListener('click', () => {
+                            this.trackDocumentationGeneration();
+                        });
+                    }
+
+                    // Track page views
+                    this.trackPageView();
+                }
+
+                trackPageView() {
+                    const today = new Date().toISOString().split('T')[0];
+                    const existingView = this.analyticsData.pageViews.find(view => view.date === today);
+
+                    if (existingView) {
+                        existingView.views++;
+                    } else {
+                        this.analyticsData.pageViews.push({
+                            date: today,
+                            views: 1,
+                            uniqueVisitors: 1
+                        });
+                    }
+
+                    this.saveAnalyticsData();
+                }
+
+                trackDocumentationGeneration() {
+                    const audience = document.getElementById('audienceFocus').value;
+                    if (audience) {
+                        const audienceName = audience.split(' (')[0];
+                        this.analyticsData.audienceDistribution[audienceName] =
+                            (this.analyticsData.audienceDistribution[audienceName] || 0) + 1;
+                        this.saveAnalyticsData();
+                        this.updateAnalyticsDisplay();
+                    }
+                }
+
+                saveAnalyticsData() {
+                    localStorage.setItem('docAnalytics', JSON.stringify(this.analyticsData));
+                }
+
+                updateAnalyticsDisplay() {
+                    this.updateMetrics();
+                    this.updateCharts();
+                    this.updateTopPages();
+                    this.updateInsights();
+                    this.updateSearchAnalytics();
+                }
+
+                updateMetrics() {
+                    const recentData = this.getRecentData();
+                    const previousData = this.getPreviousPeriodData();
+
+                    // Total Views
+                    const totalViews = recentData.reduce((sum, day) => sum + day.views, 0);
+                    const prevTotalViews = previousData.reduce((sum, day) => sum + day.views, 0);
+                    const viewsChange = prevTotalViews > 0 ? ((totalViews - prevTotalViews) / prevTotalViews * 100).toFixed(1) : 0;
+
+                    document.getElementById('totalViews').textContent = totalViews.toLocaleString();
+                    document.getElementById('viewsChange').textContent = `${viewsChange >= 0 ? '+' : ''}${viewsChange}%`;
+
+                    // Unique Visitors
+                    const uniqueVisitors = recentData.reduce((sum, day) => sum + day.uniqueVisitors, 0);
+                    const prevUniqueVisitors = previousData.reduce((sum, day) => sum + day.uniqueVisitors, 0);
+                    const visitorsChange = prevUniqueVisitors > 0 ? ((uniqueVisitors - prevUniqueVisitors) / prevUniqueVisitors * 100).toFixed(1) : 0;
+
+                    document.getElementById('uniqueVisitors').textContent = uniqueVisitors.toLocaleString();
+                    document.getElementById('visitorsChange').textContent = `${visitorsChange >= 0 ? '+' : ''}${visitorsChange}%`;
+
+                    // Average Time (simulated)
+                    const avgTime = 4.2;
+                    document.getElementById('avgTime').textContent = `${avgTime}m`;
+
+                    // Bounce Rate (simulated)
+                    const bounceRate = 32.5;
+                    document.getElementById('bounceRate').textContent = `${bounceRate}%`;
+                }
+
+                updateCharts() {
+                    this.updateViewsChart();
+                    this.updateAudienceChart();
+                }
+
+                updateViewsChart() {
+                    const ctx = document.getElementById('viewsChart');
+                    if (!ctx) return;
+
+                    const recentData = this.getRecentData();
+
+                    // Destroy existing chart if it exists
+                    if (this.viewsChart) {
+                        this.viewsChart.destroy();
+                    }
+
+                    this.viewsChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: recentData.map(d => {
+                                const date = new Date(d.date);
+                                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            }),
+                            datasets: [{
+                                label: 'Page Views',
+                                data: recentData.map(d => d.views),
+                                borderColor: '#6366f1',
+                                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: '#94a3b8'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: '#94a3b8'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                updateAudienceChart() {
+                    const ctx = document.getElementById('audienceChart');
+                    if (!ctx) return;
+
+                    const audienceData = this.analyticsData.audienceDistribution;
+
+                    // Destroy existing chart if it exists
+                    if (this.audienceChart) {
+                        this.audienceChart.destroy();
+                    }
+
+                    this.audienceChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: Object.keys(audienceData),
+                            datasets: [{
+                                data: Object.values(audienceData),
+                                backgroundColor: [
+                                    '#6366f1',
+                                    '#8b5cf6',
+                                    '#ec4899',
+                                    '#f59e0b'
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: '#94a3b8',
+                                        padding: 20
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                updateTopPages() {
+                    const topPagesList = document.getElementById('topPagesList');
+                    if (!topPagesList) return;
+
+                    const topPages = this.analyticsData.topPages;
+
+                    topPagesList.innerHTML = topPages.map(page => `
+                <div class="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
+                    <div class="flex-1">
+                        <div class="text-gray-200 font-medium">${page.page}</div>
+                        <div class="text-gray-400 text-sm">${page.views.toLocaleString()} views</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-medium ${page.change >= 0 ? 'text-green-400' : 'text-red-400'}">
+                            ${page.change >= 0 ? '+' : ''}${page.change}%
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+                }
+
+                updateInsights() {
+                    const insightsList = document.getElementById('insightsList');
+                    if (!insightsList) return;
+
+                    const insights = this.analyticsData.insights;
+
+                    insightsList.innerHTML = insights.map(insight => `
+                <div class="p-3 rounded-lg ${this.getInsightBgClass(insight.type)}">
+                    <div class="flex items-start">
+                        <i class="fas ${this.getInsightIcon(insight.type)} mt-1 mr-3 ${this.getInsightTextClass(insight.type)}"></i>
+                        <div>
+                            <h4 class="font-semibold ${this.getInsightTextClass(insight.type)}">${insight.title}</h4>
+                            <p class="text-sm text-gray-300 mt-1">${insight.message}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+                }
+
+                updateSearchAnalytics() {
+                    const topSearches = document.getElementById('topSearches');
+                    const contentGaps = document.getElementById('contentGaps');
+
+                    if (!topSearches || !contentGaps) return;
+
+                    // Top searches
+                    topSearches.innerHTML = this.analyticsData.searchQueries.map(search => `
+                <div class="flex justify-between items-center p-2 bg-gray-800 rounded">
+                    <span class="text-gray-200">${search.query}</span>
+                    <span class="text-gray-400 text-sm">${search.count} searches</span>
+                </div>
+            `).join('');
+
+                    // Content gaps (simulated)
+                    const gaps = [
+                        { query: 'rate limiting', searches: 32 },
+                        { query: 'batch operations', searches: 15 },
+                        { query: 'SDK examples', searches: 12 }
+                    ];
+
+                    contentGaps.innerHTML = gaps.map(gap => `
+                <div class="flex justify-between items-center p-2 bg-yellow-500/10 rounded border border-yellow-500/20">
+                    <span class="text-yellow-400">${gap.query}</span>
+                    <span class="text-yellow-400 text-sm">${gap.searches} searches</span>
+                </div>
+            `).join('');
+                }
+
+                getRecentData() {
+                    const days = this.getDaysForRange();
+                    return this.analyticsData.pageViews.slice(-days);
+                }
+
+                getPreviousPeriodData() {
+                    const days = this.getDaysForRange();
+                    return this.analyticsData.pageViews.slice(-days * 2, -days);
+                }
+
+                getDaysForRange() {
+                    switch (this.currentRange) {
+                        case '7d': return 7;
+                        case '30d': return 30;
+                        case '90d': return 90;
+                        default: return 7;
+                    }
+                }
+
+                getInsightBgClass(type) {
+                    switch (type) {
+                        case 'success': return 'bg-green-500/10 border border-green-500/20';
+                        case 'warning': return 'bg-yellow-500/10 border border-yellow-500/20';
+                        case 'info': return 'bg-blue-500/10 border border-blue-500/20';
+                        default: return 'bg-gray-500/10 border border-gray-500/20';
+                    }
+                }
+
+                getInsightTextClass(type) {
+                    switch (type) {
+                        case 'success': return 'text-green-400';
+                        case 'warning': return 'text-yellow-400';
+                        case 'info': return 'text-blue-400';
+                        default: return 'text-gray-400';
+                    }
+                }
+
+                getInsightIcon(type) {
+                    switch (type) {
+                        case 'success': return 'fa-check-circle';
+                        case 'warning': return 'fa-exclamation-triangle';
+                        case 'info': return 'fa-info-circle';
+                        default: return 'fa-lightbulb';
+                    }
+                }
+            }
+
+            // Initialize Face Auth System
+            const faceAuth = new FaceAuthSystem();
+
+            // Global variables
+            let currentUser = null;
+            let useFaceAuthForLogin = true;
+            let useFaceAuthForRegister = true;
+            let analytics = null;
+
+            // Utility functions
+            function showMessage(message, bgClass = 'bg-blue-500/20', textClass = 'text-blue-400') {
+                const messageBox = document.getElementById('messageBox');
+                if (messageBox) {
+                    messageBox.textContent = message;
+                    messageBox.className = `mt-4 text-sm p-3 rounded-lg fade-in ${bgClass} ${textClass}`;
+                    messageBox.classList.remove('hidden');
+                    setTimeout(() => {
+                        messageBox.classList.add('hidden');
+                    }, 4000);
+                } else {
+                    console.log(message);
+                }
+            }
+
+            function updateUIForUser() {
+                const landingPage = document.getElementById('landingPage');
+                const appContent = document.getElementById('appContent');
+                const authButtons = document.getElementById('authButtons');
+                const userMenu = document.getElementById('userMenu');
+                const userName = document.getElementById('userName');
+
+                if (currentUser) {
+                    landingPage.classList.add('hidden');
+                    appContent.classList.remove('hidden');
+                    authButtons.classList.add('hidden');
+                    userMenu.classList.remove('hidden');
+                    userName.textContent = currentUser.name;
+                } else {
+                    landingPage.classList.remove('hidden');
+                    appContent.classList.add('hidden');
+                    authButtons.classList.remove('hidden');
+                    userMenu.classList.add('hidden');
+                }
+            }
+
+            function showAuthModal(modalType) {
+                const authModals = document.getElementById('authModals');
+                const loginModal = document.getElementById('loginModal');
+                const registerModal = document.getElementById('registerModal');
+
+                authModals.classList.remove('hidden');
+
+                if (modalType === 'login') {
+                    loginModal.classList.remove('hidden');
+                    registerModal.classList.add('hidden');
+                } else {
+                    loginModal.classList.add('hidden');
+                    registerModal.classList.remove('hidden');
+                }
+            }
+
+            function hideAuthModals() {
+                const authModals = document.getElementById('authModals');
+                authModals.classList.add('hidden');
+            }
+
+            function logout() {
+                currentUser = null;
+                updateUIForUser();
+                showMessage('You have been logged out', 'bg-blue-500/20', 'text-blue-400');
+            }
+
+            // Setup authentication event listeners
+            document.addEventListener('DOMContentLoaded', function () {
+                // Initialize face auth
+                faceAuth.initialize();
+
+                // Login/Register buttons
+                document.getElementById('loginBtn').addEventListener('click', () => {
+                    showAuthModal('login');
+                });
+
+                document.getElementById('registerBtn').addEventListener('click', () => {
+                    showAuthModal('register');
+                });
+
+                document.getElementById('landingRegisterBtn').addEventListener('click', () => {
+                    showAuthModal('register');
+                });
+
+                document.getElementById('finalRegisterBtn').addEventListener('click', () => {
+                    showAuthModal('register');
+                });
+
+                // View Documentation buttons
+                document.getElementById('viewDocsBtn').addEventListener('click', () => {
+                    // Show sample documentation
+                    document.getElementById('landingPage').classList.add('hidden');
+                    document.getElementById('appContent').classList.remove('hidden');
+                    showMessage('Viewing sample documentation', 'bg-blue-500/20', 'text-blue-400');
+                });
+
+                document.getElementById('finalViewDocsBtn').addEventListener('click', () => {
+                    // Show sample documentation
+                    document.getElementById('landingPage').classList.add('hidden');
+                    document.getElementById('appContent').classList.remove('hidden');
+                    showMessage('Viewing sample documentation', 'bg-blue-500/20', 'text-blue-400');
+                });
+
+                // Switch between login and register modals
+                document.getElementById('switchToRegister').addEventListener('click', () => {
+                    showAuthModal('register');
+                });
+
+                document.getElementById('switchToLogin').addEventListener('click', () => {
+                    showAuthModal('login');
+                });
+
+                // Close modals when clicking outside
+                document.getElementById('authModals').addEventListener('click', (e) => {
+                    if (e.target.id === 'authModals') {
+                        hideAuthModals();
+                    }
+                });
+
+                // Face auth option buttons
+                document.getElementById('faceLoginBtn').addEventListener('click', () => {
+                    useFaceAuthForLogin = true;
+                    document.getElementById('faceLoginBtn').classList.add('active');
+                    document.getElementById('passwordLoginBtn').classList.remove('active');
+                });
+
+                document.getElementById('passwordLoginBtn').addEventListener('click', () => {
+                    useFaceAuthForLogin = false;
+                    document.getElementById('passwordLoginBtn').classList.add('active');
+                    document.getElementById('faceLoginBtn').classList.remove('active');
+                });
+
+                document.getElementById('faceRegisterBtn').addEventListener('click', () => {
+                    useFaceAuthForRegister = true;
+                    document.getElementById('faceRegisterBtn').classList.add('active');
+                    document.getElementById('passwordRegisterBtn').classList.remove('active');
+                });
+
+                document.getElementById('passwordRegisterBtn').addEventListener('click', () => {
+                    useFaceAuthForRegister = false;
+                    document.getElementById('passwordRegisterBtn').classList.add('active');
+                    document.getElementById('faceRegisterBtn').classList.remove('active');
+                });
+
+                // Login form submission
+                document.getElementById('loginForm').addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    const email = document.getElementById('loginEmail').value;
+                    const password = document.getElementById('loginPassword').value;
+
+                    if (useFaceAuthForLogin) {
+                        // Use face authentication
+                        const result = await faceAuth.verifyFace(email);
+
+                        if (result.success) {
+                            // Face verified successfully
+                            currentUser = {
+                                name: email.split('@')[0] || 'User',
+                                email: email
+                            };
+                            updateUIForUser();
+                            hideAuthModals();
+                            showMessage(`Login successful! Face verified (${result.similarity}% match)`, 'bg-green-500/20', 'text-green-400');
+                        } else {
+                            if (result.attemptsExceeded) {
+                                showMessage('Face verification failed multiple times. Please use password login.', 'bg-red-500/20', 'text-red-400');
+                            } else {
+                                showMessage(`Face verification failed: ${result.message}`, 'bg-red-500/20', 'text-red-400');
+                            }
+                        }
+                    } else {
+                        // Use password-only authentication
+                        currentUser = {
+                            name: email.split('@')[0] || 'User',
+                            email: email
+                        };
+                        updateUIForUser();
+                        hideAuthModals();
+                        showMessage('Login successful!', 'bg-green-500/20', 'text-green-400');
+                    }
+                });
+
+                // Register form submission
+                document.getElementById('registerForm').addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    const email = document.getElementById('registerEmail').value;
+                    const name = document.getElementById('registerName').value;
+                    const password = document.getElementById('registerPassword').value;
+
+                    if (useFaceAuthForRegister) {
+                        // Register with face authentication
+                        const result = await faceAuth.registerFace(email);
+
+                        if (result.success) {
+                            currentUser = { name: name, email: email };
+                            updateUIForUser();
+                            hideAuthModals();
+                            showMessage('Registration successful! Face registered.', 'bg-green-500/20', 'text-green-400');
+                        } else {
+                            showMessage(`Face registration failed: ${result.message}`, 'bg-red-500/20', 'text-red-400');
+                        }
+                    } else {
+                        // Register without face authentication
+                        currentUser = { name: name, email: email };
+                        updateUIForUser();
+                        hideAuthModals();
+                        showMessage('Registration successful!', 'bg-green-500/20', 'text-green-400');
+                    }
+                });
+
+                // Logout functionality
+                document.getElementById('logoutBtn').addEventListener('click', logout);
+
+                // User menu dropdown
+                document.getElementById('userButton').addEventListener('click', function () {
+                    const dropdown = document.getElementById('userDropdown');
+                    dropdown.classList.toggle('hidden');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!e.target.closest('.user-menu')) {
+                        document.getElementById('userDropdown').classList.add('hidden');
+                    }
+                });
+
+                // Tab functionality
+                function setupTabs() {
+                    const tabs = document.querySelectorAll('.tab-button');
+                    const contents = document.querySelectorAll('.tab-content');
+
+                    tabs.forEach(tab => {
+                        tab.addEventListener('click', () => {
+                            // Remove active class from all tabs and contents
+                            tabs.forEach(t => t.classList.remove('active'));
+                            contents.forEach(c => c.classList.remove('active'));
+
+                            // Add active class to clicked tab and corresponding content
+                            tab.classList.add('active');
+                            const contentId = tab.id.replace('Tab', 'Content');
+                            document.getElementById(contentId).classList.add('active');
+
+                            // Initialize analytics if analytics tab is selected
+                            if (tab.id === 'analyticsTab') {
+                                if (!analytics) {
+                                    analytics = new DocumentationAnalytics();
+                                }
+                            }
+                        });
+                    });
+                }
+
+                setupTabs();
+
+                // Documentation generation (simplified)
+                document.getElementById('generateBtn').addEventListener('click', function () {
+                    const button = this;
+                    const buttonText = document.getElementById('buttonText');
+                    const loadingIndicator = document.getElementById('loadingIndicator');
+                    const apiSpec = document.getElementById('apiSpec').value;
+                    const audience = document.getElementById('audienceFocus').value;
+
+                    if (!apiSpec) {
+                        showMessage('Please paste your API specification first', 'bg-red-500/20', 'text-red-400');
+                        return;
+                    }
+
+                    // Show loading state
+                    buttonText.textContent = 'Generating...';
+                    loadingIndicator.classList.remove('hidden');
+                    button.disabled = true;
+
+                    // Simulate API call
+                    setTimeout(() => {
+                        // Update documentation sections
+                        document.getElementById('overview').innerHTML = `
+                        <p>This API provides comprehensive ${audience.split(' (')[0].toLowerCase()} functionality with robust security and easy integration.</p>
+                        <p class="mt-2">Key features include:</p>
+                        <ul class="list-disc list-inside mt-2 ml-4">
+                            <li>Secure authentication and authorization</li>
+                            <li>RESTful design principles</li>
+                            <li>Comprehensive error handling</li>
+                            <li>Rate limiting for fair usage</li>
+                        </ul>
+                    `;
+
+                        document.getElementById('quickstart').innerHTML = `
+                        <p>Get started with the API in just a few steps:</p>
+                        <ol class="list-decimal list-inside mt-2 ml-4">
+                            <li>Obtain your API key from the dashboard</li>
+                            <li>Set up authentication headers</li>
+                            <li>Make your first API call</li>
+                            <li>Handle responses and errors</li>
+                        </ol>
+                        <div class="mt-4 p-3 bg-gray-800 rounded">
+                            <code class="text-sm">curl -X GET "https://api.example.com/v1/endpoint" -H "Authorization: Bearer YOUR_API_KEY"</code>
+                        </div>
+                    `;
+
+                        document.getElementById('security').innerHTML = `
+                        <p>This API implements industry-standard security measures:</p>
+                        <ul class="list-disc list-inside mt-2 ml-4">
+                            <li>OAuth 2.0 authentication</li>
+                            <li>HTTPS encryption for all requests</li>
+                            <li>API key validation</li>
+                            <li>Rate limiting to prevent abuse</li>
+                            <li>Data encryption at rest</li>
+                        </ul>
+                    `;
+
+                        // Show download section
+                        document.getElementById('downloadSection').classList.remove('hidden');
+
+                        // Reset button state
+                        buttonText.textContent = 'Generate Docs';
+                        loadingIndicator.classList.add('hidden');
+                        button.disabled = false;
+
+                        showMessage('Documentation generated successfully!', 'bg-green-500/20', 'text-green-400');
+                    }, 2000);
+                });
+
+                // Download functionality
+                document.getElementById('downloadPDF').addEventListener('click', function () {
+                    showMessage('PDF download started...', 'bg-blue-500/20', 'text-blue-400');
+                });
+
+                document.getElementById('downloadMarkdown').addEventListener('click', function () {
+                    showMessage('Markdown download started...', 'bg-blue-500/20', 'text-blue-400');
+                });
+
+                document.getElementById('downloadHTML').addEventListener('click', function () {
+                    showMessage('HTML download started...', 'bg-blue-500/20', 'text-blue-400');
+                });
+            });
+        </script>
+    </body>
+
+</html>
